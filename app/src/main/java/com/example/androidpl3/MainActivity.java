@@ -33,50 +33,19 @@ public class MainActivity extends AppCompatActivity {
     private Button loadFile;
     private  Button convert;
     private ImageView imageView;
-    Bitmap bitmap = null;
-    Uri imageUri;
-    @SuppressLint("WrongThread")
+    private Bitmap bitmap = null;
+    private Uri imageUri;
+    @SuppressLint({"WrongThread", "CheckResult"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageView = findViewById(R.id.imageView);
+
         initViews();
 
-        loadFile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                photoPickerIntent.setType("image/*");
-                startActivityForResult(photoPickerIntent, 1);
+        loadFile.setOnClickListener(new TakeAPhoto());
 
-            }
-
-        });
-
-        convert.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                FileOutputStream out = null;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    out = new FileOutputStream(new File(getExternalFilesDir("Downloads"),"test.png"));
-                    System.out.println("!!!!!!!!!!!!!!!!!!!!!!" + getExternalFilesDir("Downloads"));
-                    bitmap.compress(Bitmap.CompressFormat.PNG,100,out);
-                    System.out.println("save it!");
-                    out.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        convert.setOnClickListener(new ConvertIt());
 
       /*  Single.create(new SingleOnSubscribe<String>() {
 
@@ -113,9 +82,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    private void initViews(){
+        outputText = findViewById(R.id.text_loading);
+        loadFile = findViewById(R.id.button);
+        convert = findViewById(R.id.button2);
+        imageView = findViewById(R.id.imageView);
+    }
+
+    public class TakeAPhoto implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, 1);
+        }
+    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+       if (data !=null){
         if (data.getData() != null) {
             imageUri = data.getData();
             try {
@@ -127,12 +112,32 @@ public class MainActivity extends AppCompatActivity {
             outputText.setText(imageUri.toString());
 
         }
+        }else{
+        outputText.setText("You need take a Photo");}
     }
 
-    private void initViews(){
-        outputText = findViewById(R.id.text_loading);
-        loadFile = findViewById(R.id.button);
-        convert = findViewById(R.id.button2);
 
+    public class ConvertIt implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            FileOutputStream out = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                out = new FileOutputStream(new File(getExternalFilesDir("Downloads"),"test.png"));
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!" + getExternalFilesDir("Downloads"));
+                bitmap.compress(Bitmap.CompressFormat.PNG,100,out);
+                System.out.println("save it!");
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
