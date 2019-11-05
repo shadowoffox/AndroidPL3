@@ -3,6 +3,7 @@ package com.example.androidpl3;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Picture;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         imageView = findViewById(R.id.imageView);
         initViews();
+
         loadFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -62,8 +65,10 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 try {
-                    out = new FileOutputStream("qwerty");
+                    out = new FileOutputStream(new File(getExternalFilesDir("Downloads"),"test.png"));
+                    System.out.println("!!!!!!!!!!!!!!!!!!!!!!" + getExternalFilesDir("Downloads"));
                     bitmap.compress(Bitmap.CompressFormat.PNG,100,out);
+                    System.out.println("save it!");
                     out.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
